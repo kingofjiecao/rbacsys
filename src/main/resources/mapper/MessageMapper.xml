@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltc.rbacsys.mapper.MessageMapper">
+    <resultMap id="messageWithGroupId" type="ltc.rbacsys.bean.dto.MessageWithGroupId">
+        <id column="cid" property="cid"/>
+        <result column="user_name" property="userName"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="group_id" property="groupId"/>
+    </resultMap>
+    <select id="selectAllMessageWithGroupId" resultMap="messageWithGroupId">
+        select m.cid cid,m.title title,m.content content,m.create_time create_time,m.update_time update_time,
+        m.user_id user_id,u.group_id group_id,u.user_name user_name
+        from tb_message m left join tb_user u on m.user_id=u.uid;
+    </select>
+    <select id="selectMessageWithGroupIdByGroupId" resultMap="messageWithGroupId">
+        select m.cid cid,m.title title,m.content content,m.create_time create_time,m.update_time update_time,
+        m.user_id user_id,u.group_id group_id,u.user_name user_name
+        from tb_message m left join tb_user u on m.user_id=u.uid where u.group_id=#{groupId};
+    </select>
+    <select id="selectMessageWithGroupIdByUserId" resultMap="messageWithGroupId">
+        select m.cid cid,m.title title,m.content content,m.create_time create_time,m.update_time update_time,
+        m.user_id user_id,u.group_id group_id,u.user_name user_name
+        from tb_message m left join tb_user u on m.user_id=u.uid where u.uid=#{uid};
+    </select>
+    <delete id="deleteMessageById">
+        delete from tb_message where cid=#{cid}
+    </delete>
+    <select id="selectAllMessageWithUserName" resultType="ltc.rbacsys.bean.dto.MessageWithUserName">
+        select m.cid,m.title,m.content,u.user_name from tb_message m left join tb_user u on m.user_id=u.uid
+    </select>
+    <select id="selectMessageByCid" resultType="ltc.rbacsys.bean.Message">
+        select * from tb_message where cid=#{cid}
+    </select>
+    <insert id="insertMessage">
+        insert into tb_message(title,content,create_time,user_id)
+        values (#{title},#{content},#{createTime},#{userId})
+    </insert>
+    <update id="updateMessage">
+        update tb_message
+        <set>
+            <if test="title!=null&amp;&amp;title!=''">
+                title=#{title},
+            </if>
+            <if test="content!=null&amp;&amp;content!=''">
+                content=#{content},
+            </if>
+        </set>
+        <where>
+            cid=#{cid}
+        </where>
+    </update>
+</mapper>

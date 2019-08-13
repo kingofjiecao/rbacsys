@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltc.rbacsys.mapper.PermissionMapper">
+    <select id="selectDeleteMessagePermission" resultType="ltc.rbacsys.bean.Message">
+        select * from (select * from tb_user join tb_user_role on uid = user_id) as t
+        join tb_role_permission tp on t.role_id = tp.role_id
+        where uid = #{uid} and permission_id=10;
+    </select>
+    <select id="selectDeleteMessagePermissionWithCid" resultType="ltc.rbacsys.bean.Message">
+        select m.title,m.content from tb_message m left join tb_user u
+        on m.user_id=u.uid
+        where u.uid=#{uid} and m.cid=#{cid};
+    </select>
+    <select id="selectUpdateMessagePermission" resultType="ltc.rbacsys.bean.User">
+        select * from (select * from tb_user join tb_user_role on uid = user_id) as t
+        join tb_role_permission tp on t.role_id = tp.role_id
+        where uid = #{uid} and permission_id=8;
+    </select>
+    <select id="selectUpdateMessagePermissionWithCid" resultType="ltc.rbacsys.bean.Message">
+        select * from tb_message where user_id in
+        (select user_id from tb_user where group_id=#{groupId}) and cid = #{cid};
+    </select>
+    <select id="selectUpdateMessagePermissionByUid" resultType="ltc.rbacsys.bean.Message">
+        select * from tb_message where user_id = #{uid} and cid =#{cid};
+    </select>
+    <select id="selectAllPermission" resultType="ltc.rbacsys.bean.Permission">
+        select * from tb_permission
+    </select>
+    <select id="selectPermissionByRid" resultType="ltc.rbacsys.bean.Permission">
+        select * from tb_permission where permission_id in
+        (select permission_id from tb_role r join tb_role_permission rp
+        on r.role_id = rp.role_id where r.role_id = #{rid});
+    </select>
+    <insert id="insertPermission">
+        insert into tb_role_permission(role_id,permission_id) values
+        <foreach collection="ids" item="id" separator=",">
+            (#{roleId},#{id})
+        </foreach>
+    </insert>
+    <delete id="deletePermissionByRid">
+        delete from tb_role_permission where role_id=#{roleId}
+    </delete>
+</mapper>

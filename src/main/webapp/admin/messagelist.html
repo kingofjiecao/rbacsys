@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.siderpage{
+				position: fixed;
+				height: 100%;
+				width: 200px;
+			}
+			.userinfo{
+				padding: 5px;
+				width: 100%;
+				min-height: 75px;
+				margin-bottom: 10px;
+				text-align: center;
+			}
+			.siderpage{
+				background-color: #a0a0a0;
+				border: azure solid 1px;
+			}
+			.menu{
+				font-size: 1.5em;
+				text-align: center;
+				margin: 5px;
+				cursor: pointer;
+			}
+			.menu:hover{
+				background-color: cornflowerblue;
+			}
+			.menuselected{
+				background-color: #909090;
+			}
+			.menutitle{
+				font-size: 2em;
+				text-align: center;
+				margin-bottom: 10px;
+				background-color: #808080;
+				cursor: pointer;
+			}
+			.submenu{
+				
+			}
+			.mainpage{
+				margin-left: 200px;
+				/* background-color: aquamarine; */
+				width: 1000px;
+				height: 100%;
+				padding: 20px;
+			}
+			body{
+				background-color: darkgray;
+			}
+			.container{
+				margin-left: 120px;
+				margin-right: 160px;
+			}
+			td{
+				width: 20%;
+				text-align: center;
+				height: 50px;
+			}
+			table{
+				font-size: 1em;
+			}
+			table,th,tr,td{
+				border: black solid 1px;
+			}
+			.maininfo{
+				margin-top: 35px;
+			}
+			.message{
+				margin: 5px auto 5px;
+			}
+			.messagetab{
+				width: 33%;
+				font-size: 2em;
+				border-left: #ddd solid 1px;
+				border-top: #ddd solid 1px;
+				border-right: #000 solid 1px;
+				border-bottom: #000 solid 1px;
+				color: blue;
+				padding: 5px;
+			}
+			.active{
+				border-left: #000 solid 1px;
+				border-top: #000 solid 1px;
+				border-right: #ddd solid 1px;
+				border-bottom: #ddd solid 1px;
+			}
+			.messages{
+				text-align: center;
+				width: 100%;
+			}
+		</style>
+		<script>
+			$(function(){
+                $.getJSON("/getuserinfo",function (result) {
+                    var user = result.user;
+                    var html = "<div style=\"font-size: 2em;text-align: center;\"><b>" + user.userName + "</b></div>" +
+                        "<div style=\"text-align: center;\"><span>" + user.email + "</span></div>" +
+                        "<div style=\"text-align: center;\"><button id=\"logout\">登出</button></div>";
+                    html += "<a href='/user/userinfo.html'>返回普通模式</a>";
+                    $(".userinfo").append(html);
+                });
+                $.getJSON("/getallmessagewithname",function (result) {
+					var messages = result.messages;
+					fillmessagelist(messages);
+                });
+                function fillmessagelist(messages) {
+                    $.each(messages,function (i, val) {
+                        var html = "<tr><td>" + val.cid + "</td><td>" + val.title + "</td>" +
+							"<td>" + val.content + "</td>" +
+							"<td>" + val.userName + "</td>" +
+							"<td><a class=\"managemessage\" id='manage-" + val.cid + "'>管理</a>&nbsp;&nbsp;" +
+							"<a class=\"deletemessage\" id='delete-" + val.cid + "'>删除</a></td></tr>";
+                        $(".messages").append(html);
+                    });
+                }
+                $("body").on("click",".managemessage",function () {
+                    var id = this.id.split("-")[1];
+                    window.location.href = "/admin/messagemanage.html?cid=" + id;
+                });
+                $("body").on("click",".deletemessage",function () {
+                    var id = this.id.split("-")[1];
+                    $.getJSON("/deletemessage",{"cid":id},function (result) {
+                        if (result.status == 200) {
+                            alert(result.message);
+                            window.location.href = "/admin/messagelist.html";
+                        } else if (result.status) {
+                            alert(result.message);
+                        }
+                    });
+                });
+                $("#usercenter").click(function () {
+                    window.location.href = "/admin/userinfo.html";
+                });
+                $("#messagemanage").click(function () {
+                    window.location.href = "/admin/messagelist.html";
+                });
+                $("#groupmanage").click(function () {
+                    window.location.href = "/admin/grouplist.html";
+                });
+                $("#rolemanage").click(function () {
+                    window.location.href = "/admin/rolelist.html";
+                });
+                $("#usermanage").click(function () {
+                    window.location.href = "/admin/userlist.html";
+                });
+                function formatDate(now)   {
+                    var d = new Date(now);
+                    var year=d.getFullYear();
+                    var month=d.getMonth()+1;
+                    var date=d.getDate();
+                    var hour=d.getHours();
+                    var minute=d.getMinutes();
+                    var second=d.getSeconds();
+                    return year+"-"+month+"-"+date+"   "+hour+":"+minute+":"+second;
+                }
+			});
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="siderpage">
+				<div class="userinfo">
+				</div>
+				<div class="menulist">
+					<div id="usercenter" class="menutitle">管理菜单</div>
+					<div id="messagemanage" class="menu menuselected">留言管理</div>
+					<div id="groupmanage" class="menu">用户组管理</div>
+					<div id="rolemanage" class="menu">角色管理</div>
+					<div id="usermanage" class="menu">用户管理</div>
+				</div>
+			</div>
+			<div class="mainpage">
+				<div class="headinfo">
+					<h1>留言板</h1>
+				</div>
+				<hr/>
+				<div class="querymessage">
+					<button id="addmessage"><a href="/admin/messagemanage.html">新建留言</a></button>
+				</div>
+				<div class="maininfo">
+					<div class="messagelist">
+						<table class="messages">
+							<tr>
+								<td>文章id</td>
+								<td>文章标题</td>
+								<td>文章内容</td>
+								<td>文章作者</td>
+								<td>操作</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.siderpage{
+				position: fixed;
+				height: 100%;
+				width: 200px;
+			}
+			.userinfo{
+				padding: 5px;
+				width: 100%;
+				min-height: 75px;
+				margin-bottom: 10px;
+				text-align: center;
+			}
+			.siderpage{
+				background-color: #a0a0a0;
+				border: azure solid 1px;
+			}
+			.menu{
+				font-size: 1.5em;
+				text-align: center;
+				margin: 5px;
+				cursor: pointer;
+			}
+			.menu:hover{
+				background-color: cornflowerblue;
+			}
+			.menuselected{
+				background-color: #909090;
+			}
+			.menutitle{
+				font-size: 2em;
+				text-align: center;
+				margin-bottom: 10px;
+				background-color: #808080;
+				cursor: pointer;
+			}
+			.submenu{
+				
+			}
+			.mainpage{
+				margin-left: 200px;
+				/* background-color: aquamarine; */
+				width: 1000px;
+				height: 100%;
+				padding: 20px;
+			}
+			body{
+				background-color: darkgray;
+			}
+			.container{
+				margin-left: 120px;
+				margin-right: 160px;
+			}
+			td{
+				width: 20%;
+				text-align: center;
+				height: 50px;
+			}
+			table{
+				font-size: 1.5em;
+			}
+			table,th,tr,td{
+				border: black solid 1px;
+			}
+			.maininfo{
+				margin-top: 35px;
+			}
+			.message{
+				margin: 5px auto 5px;
+			}
+			.messagetab{
+				width: 33%;
+				font-size: 2em;
+				border-left: #ddd solid 1px;
+				border-top: #ddd solid 1px;
+				border-right: #000 solid 1px;
+				border-bottom: #000 solid 1px;
+				color: blue;
+				padding: 5px;
+			}
+			.active{
+				border-left: #000 solid 1px;
+				border-top: #000 solid 1px;
+				border-right: #ddd solid 1px;
+				border-bottom: #ddd solid 1px;
+			}
+		</style>
+		<script>
+			$(function(){
+                $("body").on("click","#logout",function () {
+                    $.ajax({
+                        url:"/logout",
+                        success:function () {
+                            alert("下线成功");
+                            window.location.href = "/login.html";
+                        }
+                    });
+                });
+                function fillmessagelist(messages) {
+                    $.each(messages,function (i, val) {
+                        var html = "<div class='message' style='padding: 5px;border: #d0d0d0 solid 1px;'>\n" +
+                            "\<span><a href='myinfo.html'>" + val.userName + "</a></span>" +
+                            "<span style='color: grey;'><em>最后发表于： " + formatDate(val.updateTime) + "</em></span>" +
+                            "<h3 style='margin: 0;'>" + val.title + "</h3>" +
+                            "<p style='word-break:break-all;'>" + val.content + "</p>" +
+                            "<button class='btn-modify' style='border-bottom-color: #d0d0d0;border-right-color:#d0d0d0;' value=" + val.cid + ">修改</button>" +
+                            "<button class='btn-delete' style='border-bottom-color: #d0d0d0;border-right-color:#d0d0d0;' value=" + val.cid + ">删除</button>" +
+                            "</div>"
+                        $(".messagelist").append(html);
+                    });
+                }
+                $.getJSON("/getuserinfo",function (result) {
+                    var user = result.user;
+                    var html = "<div style=\"font-size: 2em;text-align: center;\"><b>" + user.userName + "</b></div>" +
+                        "<div style=\"text-align: center;\"><span>" + user.email + "</span></div>" +
+                        "<div style=\"text-align: center;\"><button id=\"logout\">登出</button></div>";
+                    if (user.admin) {
+                        html +="<a href=\"/admin/userinfo.html\">管理员模式</a>";
+                    }
+                    $(".userinfo").append(html);
+                });
+                $.getJSON("/getallmessage",function (result) {
+                    $(".messagelist").empty();
+					var messages = result.messages;
+					fillmessagelist(messages);
+                });
+                $("#allmessage").click(function () {
+					$(".messagelist").empty();
+					$(this).addClass("active").siblings().removeClass("active");
+                    $.getJSON("/getallmessage",function (result) {
+                        var messages = result.messages;
+                        fillmessagelist(messages);
+                    });
+                });
+                $("#groupmessage").click(function () {
+                    $(".messagelist").empty();
+                    $(this).addClass("active").siblings().removeClass("active");
+                    $.getJSON("/getgroupmessage",function (result) {
+                        var messages = result.messages;
+                        fillmessagelist(messages);
+                    });
+                });
+                $("#mymessage").click(function () {
+                    $(".messagelist").empty();
+                    $(this).addClass("active").siblings().removeClass("active");
+                    $.getJSON("/getmymessage",function (result) {
+                        var messages = result.messages;
+                        fillmessagelist(messages);
+                    });
+                });
+
+                $("body").on("click", ".btn-delete", function () {
+                    var cid = this.value;
+                    $.getJSON("/deletemessage",{"cid":cid},function (result) {
+						if (result.status == 200) {
+						    alert(result.message);
+						    window.location.href = "/user/messageboard.html";
+						} else if (result.status == 400) {
+						    alert(result.message);
+						}
+                    });
+                });
+                $("body").on("click", ".btn-modify", function () {
+                    var cid = $(".btn-modify").val();
+                    window.location.href = "/user/editmessage.html?cid=" + cid;
+                });
+                $("#usercenter").click(function () {
+                    window.location.href = "/user/userinfo.html";
+                });
+                $("#messageboard").click(function () {
+                    window.location.href = "/user/messageboard.html";
+                });
+                $("#group").click(function () {
+                    window.location.href = "/user/usergroup.html";
+                });
+                function formatDate(now)   {
+                    var d = new Date(now);
+                    var year=d.getFullYear();
+                    var month=d.getMonth()+1;
+                    var date=d.getDate();
+                    var hour=d.getHours();
+                    var minute=d.getMinutes();
+                    var second=d.getSeconds();
+                    return year+"-"+month+"-"+date+"   "+hour+":"+minute+":"+second;
+                }
+			});
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="siderpage">
+				<div class="userinfo">
+				</div>
+				<div class="menulist">
+					<div id="usercenter" class="menutitle">用户中心▽</div>
+					<div id="messageboard" class="menu menuselected">留言板</div>
+					<div id="group" class="menu">用户组</div>
+				</div>
+			</div>
+			<div class="mainpage">
+				<div class="headinfo">
+					<h1>留言板</h1>
+				</div>
+				<hr/>
+				<div class="querymessage">
+					输入查询用户：<input type="text" id="finduser" name="user"/><button id="query"><a>查询</a></button>
+					<button id="addmessage"><a href="/user/editmessage.html">新建留言</a></button>
+				</div>
+				<div class="maininfo">
+					<div style="width: 100%;">
+						<span id="allmessage" class="messagetab active">全部留言</span>
+						<span id="groupmessage" class="messagetab">组的留言</span>
+						<span id="mymessage" class="messagetab">我的留言</span>	
+					</div>
+					<div class="messagelist">
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

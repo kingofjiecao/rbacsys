@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.siderpage{
+				position: fixed;
+				height: 100%;
+				width: 200px;
+			}
+			.userinfo{
+				padding: 5px;
+				width: 100%;
+				min-height: 75px;
+				margin-bottom: 10px;
+				text-align: center;
+			}
+			.siderpage{
+				background-color: #a0a0a0;
+				border: azure solid 1px;
+			}
+			.menu{
+				font-size: 1.5em;
+				text-align: center;
+				margin: 5px;
+			}
+			.menu:hover{
+				background-color: cornflowerblue;
+			}
+			.menuselected{
+				background-color: #909090;
+			}
+			.menutitle{
+				font-size: 2em;
+				text-align: center;
+				margin-bottom: 10px;
+				/* border: black solid 0.1875rem; */
+				background-color: #808080;
+			}
+			.submenu{
+				
+			}
+			.mainpage{
+				margin-left: 200px;
+				/* background-color: aquamarine; */
+				width: 1000px;
+				height: 100%;
+				padding: 20px;
+			}
+			body{
+				margin: 0 auto 0;
+				background-color: darkgray;
+			}
+			.container{
+				margin-left: 120px;
+				margin-right: 160px;
+			}
+			td{
+				/* width: 20%; */
+				text-align: center;
+				height: 50px;
+			}
+			table{
+				font-size: 1.5em;
+			}
+			table,th,tr,td{
+				border: black solid 1px;
+			}
+			.maininfo{
+				margin-top: 35px;
+			}
+			.message{
+				margin: 5px auto 5px;
+			}
+			.messagetab{
+				width: 33%;
+				font-size: 2em;
+				border-left: #ddd solid 1px;
+				border-top: #ddd solid 1px;
+				border-right: #000 solid 1px;
+				border-bottom: #000 solid 1px;
+				color: blue;
+				padding: 5px;
+			}
+			
+			.active{
+				border-left: #000 solid 1px;
+				border-top: #000 solid 1px;
+				border-right: #ddd solid 1px;
+				border-bottom: #ddd solid 1px;
+			}
+			.usergrouplist{
+				margin: 10px;
+			}
+			.col_5_1{
+				width: 20%;
+			}
+			.col_5_2{
+				width: 40%;
+			}
+			.col_5_3{
+				width: 60%;
+			}
+			.updatingmessage{
+				text-align: center;
+			}
+		</style>
+		<script>
+			function getModifyMessage(url){
+			    if (url.indexOf("?") == -1) {
+					return;
+				}
+				url = url.split("cid=")[1];
+                $.getJSON("/getmodifymessageinfo?cid=" + url,function (result) {
+                    var message = result.message;
+                    $("#cid").val(message.cid);
+                    $("#title").val(message.title);
+                    $("#content").html(message.content);
+                    $("#createmessage").remove();
+                    $("#modifymessage").show();
+                });
+			}
+			$(function(){
+			    getModifyMessage(window.location.search);
+			    $("#createmessage").click(function () {
+                    var title = $("#title").val();
+                    var content = $("#content").val();
+                    var data = {"title":title,"content":content};
+                    $.getJSON("/createmessage",data,function (result) {
+                        if (result.status == 200) {
+                            alert(result.message);
+                            window.location.href = "/admin/messagelist.html";
+                        } else if (result.status == 400) {
+                            alert(result.message);
+                        }
+                    });
+                });
+			    $("#modifymessage").click(function () {
+					var title = $("#title").val();
+                    var cid = $("#cid").val();
+                    var content = $("#content").val();
+                    var data = {"cid":cid,"content":content,"title":title};
+                    $.getJSON("/modifymessage",data,function (result) {
+						if (result.status == 200) {
+						    alert(result.message);
+						    window.location.href = "/admin/messagelist.html";
+						} else if (result.status == 400) {
+						    alert(result.message);
+						}
+                    });
+                });
+                $.getJSON("/getuserinfo",function (result) {
+                    var user = result.user;
+                    var html = "<div style=\"font-size: 2em;text-align: center;\"><b>" + user.userName + "</b></div>" +
+                        "<div style=\"text-align: center;\"><span>" + user.email + "</span></div>" +
+                        "<div style=\"text-align: center;\"><button id=\"logout\">登出</button></div>";
+                    html += "<a href='/user/userinfo.html'>返回普通模式</a>";
+                    $(".userinfo").append(html);
+                });
+                $("#usercenter").click(function () {
+                    window.location.href = "/admin/userinfo.html";
+                });
+                $("#messagemanage").click(function () {
+                    window.location.href = "/admin/messagelist.html";
+                });
+                $("#groupmanage").click(function () {
+                    window.location.href = "/admin/grouplist.html";
+                });
+                $("#rolemanage").click(function () {
+                    window.location.href = "/admin/rolelist.html";
+                });
+                $("#usermanage").click(function () {
+                    window.location.href = "/admin/userlist.html";
+                });
+			});
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="siderpage">
+				<div class="userinfo">
+					
+				</div>
+				<div class="menulist">
+					<div id="usercenter" class="menutitle">管理菜单</div>
+					<div id="messagemanage" class="menu menuselected">留言管理</div>
+					<div id="groupmanage" class="menu">用户组管理</div>
+					<div id="rolemanage" class="menu">角色管理</div>
+					<div id="usermanage" class="menu">用户管理</div>
+				</div>
+			</div>
+			<div class="mainpage">
+				<div class="headinfo">
+					<span style="font-size: 1.5em;"><a href="/admin/messagelist.html">返回</a></span>
+					<h1>编辑留言</h1>
+				</div>
+				<hr/>
+				<div class="maininfo">
+					<div id="mygroupinfo">
+					</div>
+					<div class="updatingmessage">
+						<input id="cid" type="hidden" />
+						标 题：<input id="title" name="title" style="width: 400px;"/><br/>
+						内 容：<textarea id="content" style="width: 400px;height: 150px;"></textarea><br/>
+						<button id="createmessage">确定发布</button>
+						<button id="modifymessage" style="display: none;">确认修改</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
