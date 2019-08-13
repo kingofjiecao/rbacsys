@@ -38,7 +38,6 @@ public class RoleController {
             json.put("status", 400);
             json.put("message", "修改角色失败");
         }
-        System.out.println(json);
         return json.toJSONString();
     }
 

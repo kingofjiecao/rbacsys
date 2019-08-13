@@ -41,10 +41,16 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public boolean modifyRole(RoleManageVO roleManageVO) {
         List<Integer> ids = new ArrayList<Integer>();
-        ids = Arrays.asList(roleManageVO.getIds());
         boolean result1 = roleMapper.updateRole(roleManageVO);
         boolean result2 = permissionMapper.deletePermissionByRid(roleManageVO.getRoleId());
-        boolean result3 = permissionMapper.insertPermission(ids, roleManageVO.getRoleId());
+        boolean result3 = true;
+        if (roleManageVO.getIds() == null) {
+            result3 = true;
+        } else {
+            ids = Arrays.asList(roleManageVO.getIds());
+            result3 = permissionMapper.insertPermission(ids, roleManageVO.getRoleId());
+        }
+
         if (result1 && result3) {
             return true;
         }
@@ -54,10 +60,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public boolean createRole(RoleManageVO roleManageVO) {
         List<Integer> ids = new ArrayList<Integer>();
-        ids = Arrays.asList(roleManageVO.getIds());
         if (roleMapper.insertRole(roleManageVO)) {
-            if (permissionMapper.insertPermission(ids, roleManageVO.getRoleId())) {
+            if (roleManageVO.getIds() == null) {
                 return true;
+            } else {
+                ids = Arrays.asList(roleManageVO.getIds());
+                if (permissionMapper.insertPermission(ids, roleManageVO.getRoleId())) {
+                    return true;
+                }
             }
         }
         return false;

@@ -154,11 +154,14 @@
                     var roleName = $("#role_name").val();
                     var checks = $("input:checked");
                     var ids = [];
-                    $.each(checks,function (i,val) {
-                        ids.push(val.id);
-                    });
-                    var data = {"roleName":roleName,"ids":ids};
-
+                    if (checks.length == 0) {
+                        var data = {"roleName":roleName};
+                    } else {
+                        $.each(checks,function (i,val) {
+                            ids.push(val.id);
+                        });
+                        var data = {"roleName":roleName,"ids":ids};
+                    }
                     $.ajax({
                         headers: {
                             'Accept': 'application/json',
@@ -182,11 +185,14 @@
                     var roleName = $("#role_name").val();
                     var checks = $("input:checked");
                     var ids = [];
-                    $.each(checks,function (i,val) {
-						ids.push(val.id);
-                    });
-
-                    var data = {"roleId":roleId,"roleName":roleName,"ids":ids};
+                    if (checks.length == 0) {
+                        var data = {"roleId":roleId,"roleName":roleName};
+                    } else {
+                        $.each(checks,function (i,val) {
+                            ids.push(val.id);
+                        });
+                        var data = {"roleId":roleId,"roleName":roleName,"ids":ids};
+					}
                     $.ajax({
                         headers: {
                             'Accept': 'application/json',
