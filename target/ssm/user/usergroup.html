@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.siderpage{
+				position: fixed;
+				height: 100%;
+				width: 200px;
+			}
+			.userinfo{
+				padding: 5px;
+				width: 100%;
+				min-height: 75px;
+				margin-bottom: 10px;
+				text-align: center;
+			}
+			.siderpage{
+				background-color: #a0a0a0;
+				border: azure solid 1px;
+			}
+			.menu{
+				font-size: 1.5em;
+				text-align: center;
+				margin: 5px;
+			}
+			.menu:hover{
+				background-color: cornflowerblue;
+			}
+			.menuselected{
+				background-color: #909090;
+			}
+			.menutitle{
+				font-size: 2em;
+				text-align: center;
+				margin-bottom: 10px;
+				/* border: black solid 0.1875rem; */
+				background-color: #808080;
+			}
+			.submenu{
+				
+			}
+			.mainpage{
+				margin-left: 200px;
+				/* background-color: aquamarine; */
+				width: 1000px;
+				height: 100%;
+				padding: 20px;
+			}
+			body{
+				margin: 0 auto 0;
+				background-color: darkgray;
+			}
+			.container{
+				margin-left: 120px;
+				margin-right: 160px;
+			}
+			td{
+				/* width: 20%; */
+				text-align: center;
+				height: 50px;
+			}
+			table{
+				font-size: 1.5em;
+			}
+			table,th,tr,td{
+				border: black solid 1px;
+			}
+			.maininfo{
+				margin-top: 35px;
+			}
+			.message{
+				margin: 5px auto 5px;
+			}
+			.messagetab{
+				width: 33%;
+				font-size: 2em;
+				border-left: #ddd solid 1px;
+				border-top: #ddd solid 1px;
+				border-right: #000 solid 1px;
+				border-bottom: #000 solid 1px;
+				color: blue;
+				padding: 5px;
+			}
+			
+			.active{
+				border-left: #000 solid 1px;
+				border-top: #000 solid 1px;
+				border-right: #ddd solid 1px;
+				border-bottom: #ddd solid 1px;
+			}
+			.usergrouplist{
+				margin: 10px;
+			}
+			.col_5_1{
+				width: 20%;
+			}
+			.col_5_2{
+				width: 40%;
+			}
+			.col_5_3{
+				width: 60%;
+			}
+		</style>
+		<script>
+			$(function(){
+                $("body").on("click","#logout",function () {
+                    $.ajax({
+                        url:"/logout",
+                        success:function () {
+                            alert("下线成功");
+                            window.location.href = "/login.html";
+                        }
+                    });
+                });
+                $.getJSON("/getuserinfo",function (result) {
+                    var user = result.user;
+                    var html = "<div style=\"font-size: 2em;text-align: center;\"><b>" + user.userName + "</b></div>" +
+                        "<div style=\"text-align: center;\"><span>" + user.email + "</span></div>" +
+                        "<div style=\"text-align: center;\"><button id=\"logout\">登出</button></div>";
+                    if (user.admin) {
+                        html +="<a href=\"/admin/userinfo.html\">管理员模式</a>";
+                    }
+                    $(".userinfo").append(html);
+                });
+                $.getJSON("/getgroupinfo",function(result) {
+                    var groups = result.groups;
+                    $.each(groups, function (i,val) {
+                        var html = "<tr><td class=\".col_5_1\">" + val.groupName + "</td>" +
+                            "<td class=\".col_5_3\">" + val.groupInfo + "</td>" +
+                            "<td class=\".col_5_1\"><a id=" + val.gid + ">加入</a></td></tr>";
+                        if (val.gid != 1) {
+                            $(".usergroup").append(html);
+						}
+                    });
+                });
+				$("body").on("click","table tr td a",function () {
+					$.getJSON("/joingroup",{"groupId":this.id},function (result) {
+						if (result.status == 200) {
+						    alert(result.message);
+						    window.location.href = "/user/usergroup.html";
+						} else if (result.status == 400) {
+						    alert(result.message);
+						}
+                    });
+                });
+				$("body").on("click","#btn-quitgroup",function () {
+					$.getJSON("/quitgroup",function (result) {
+						alert(result.message);
+						window.location.href = "/user/usergroup.html";
+                    });
+                });
+                $.getJSON("/getmygroupinfo",function(result) {
+                    if (result.status == 200) {
+                        var group = result.group;
+                        var html = "<span style=\"font-size: 2em;font-family: simsun;\"><b>" + group.groupName +
+							"</b></span>&nbsp;&nbsp;&nbsp;<button id='btn-quitgroup'>退出该组</button>" +
+                            "<div>组名:<span>" + group.groupName + "</span></div>" +
+                            "<div>描述:<span>" + group.groupInfo + "</span></div>";
+                        $("#mygroupinfo").append(html);
+					} else if (result.status == 403) {
+                        alert(result.message);
+                        var html = "<span style=\"font-size: 2em;font-family: simsun;\"><b>未加入任何组</b></span>";
+                        $("#mygroupinfo").append(html);
+					} else {
+                        alert("请求失败");
+					}
+                });
+                $("#usercenter").click(function () {
+                    window.location.href = "/user/userinfo.html";
+                });
+                $("#messageboard").click(function () {
+                    window.location.href = "/user/messageboard.html";
+                });
+                $("#group").click(function () {
+                    window.location.href = "/user/usergroup.html";
+                });
+			});
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="siderpage">
+				<div class="userinfo">
+					
+				</div>
+				<div class="menulist">
+					<div id="usercenter" class="menutitle">用户中心▽</div>
+					<div id="messageboard" class="menu">留言板</div>
+					<div id="group" class="menu menuselected">用户组</div>
+				</div>
+			</div>
+			<div class="mainpage">
+				<div class="headinfo">
+					<h1>留言板</h1>
+				</div>
+				<hr/>
+				<div class="maininfo">
+					<div id="mygroupinfo">
+					</div>
+					<hr/>
+					<div class="usergrouplist">
+						<table class="usergroup" style="width: 100%">
+							<tr>
+								<td class=".col_5_1">组名</td>
+								<td class=".col_5_3">描述</td>
+								<td class=".col_5_1">操作</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

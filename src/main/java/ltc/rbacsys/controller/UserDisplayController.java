@@ -43,7 +43,7 @@ public class UserDisplayController {
         json.put("users", users);
         return json.toJSONString();
     }
-    @RequestMapping("/getuserrole")
+    @RequestMapping("/ ")
     public String getUserAndRole(User user) {
         UserWithRoleName u = userService.getUserWithRoleName(user);
         List<Role> roles = roleService.getAllRoles();

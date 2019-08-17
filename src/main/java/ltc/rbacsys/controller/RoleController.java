@@ -2,6 +2,7 @@ package ltc.rbacsys.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
+import ltc.rbacsys.annotation.Log;
 import ltc.rbacsys.bean.vo.RoleManageVO;
 import ltc.rbacsys.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class RoleController {
     @Autowired
     RoleService roleService;
+    @Log("删除角色")
     @ResponseBody
     @RequestMapping("/deleterole")
     public String deleteRole(Integer rid) {
@@ -27,6 +29,7 @@ public class RoleController {
         }
         return json.toJSONString();
     }
+    @Log("修改角色")
     @ResponseBody
     @RequestMapping("/modifyrole")
     public String modifyRole(@RequestBody RoleManageVO roleManageVO) {
@@ -41,6 +44,7 @@ public class RoleController {
         return json.toJSONString();
     }
 
+    @Log("新建角色")
     @ResponseBody
     @RequestMapping("/createrole")
     public String createRole(@RequestBody RoleManageVO roleManageVO) {

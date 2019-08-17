@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltc.rbacsys.mapper.RoleMapper">
+    <select id="selectAllRoles" resultType="ltc.rbacsys.bean.Role">
+        select * from tb_role;
+    </select>
+    <delete id="deleteRoleByRid">
+        delete from tb_role where role_id=#{rid}
+    </delete>
+    <select id="selectRoleByRid" resultType="ltc.rbacsys.bean.Role">
+        select * from tb_role where role_id=#{rid}
+    </select>
+    <update id="updateRole">
+        update tb_role set role_name=#{roleName} where role_id=#{roleId}
+    </update>
+    <insert id="insertRole" useGeneratedKeys="true" keyProperty="roleId">
+        insert into tb_role(role_name) values (#{roleName})
+    </insert>
+</mapper>

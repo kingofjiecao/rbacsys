@@ -1,6 +1,7 @@
 package ltc.rbacsys.controller;
 
 
+import ltc.rbacsys.annotation.Log;
 import ltc.rbacsys.bean.User;
 import ltc.rbacsys.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

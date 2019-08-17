@@ -2,6 +2,7 @@ package ltc.rbacsys.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
+import ltc.rbacsys.annotation.Log;
 import ltc.rbacsys.bean.User;
 import ltc.rbacsys.bean.UserRole;
 import ltc.rbacsys.bean.dto.UserWithRoleName;
@@ -21,10 +22,12 @@ public class UserController {
     UserService userService;
     @Autowired
     UserRoleService userRoleService;
+    @Log("修改用户信息")
     @ResponseBody
-    @RequestMapping("modifyuserinfo")
+    @RequestMapping("/modifyuserinfo")
     public String modifyUserInfo(User user, HttpSession session){
         JSONObject json = new JSONObject();
+        System.out.println(11111);
         if (userService.modifyUserInfo(user)) {
             json.put("status", 200);
             json.put("message", "修改成功,请重新登录");
@@ -33,8 +36,10 @@ public class UserController {
             json.put("status", 400);
             json.put("message", "修改失败");
         }
+        System.out.println(json.toJSONString());
         return json.toJSONString();
     }
+    @Log("加入用户组")
     @ResponseBody
     @RequestMapping("/joingroup")
     public String joinGroup(HttpServletRequest req) {
@@ -57,6 +62,7 @@ public class UserController {
         return json.toJSONString();
     }
 
+    @Log("退出用户组")
     @ResponseBody
     @RequestMapping("/quitgroup")
     public String quitGroup(HttpServletRequest req) {
@@ -72,6 +78,7 @@ public class UserController {
         }
         return json.toJSONString();
     }
+    @Log("删除用户")
     @ResponseBody
     @RequestMapping("/deleteuser")
     public String deleteUser(Integer uid) {
@@ -85,6 +92,7 @@ public class UserController {
         }
         return json.toJSONString();
     }
+    @Log("修改用户角色")
     @ResponseBody
     @RequestMapping("/modifyuserrole")
     public String modifyUserAndRole(UserWithRoleName u) {
@@ -101,6 +109,7 @@ public class UserController {
         }
         return json.toJSONString();
     }
+    @Log("创建用户")
     @ResponseBody
     @RequestMapping("/createuserole")
     public String createUserRole(UserWithRoleName u) {

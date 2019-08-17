@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltc.rbacsys.mapper.LogMapper">
+    <resultMap id="logWithUserName" type="ltc.rbacsys.bean.dto.LogWithUserName">
+        <id column="log_id" property="logId"/>
+        <result column="operation_type" property="operationType"/>
+        <result column="cost_time" property="costTime"/>
+        <result column="is_success" property="isSuccess"/>
+        <result column="operate_time" property="operateTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+    </resultMap>
+    <select id="selectAllLog" resultMap="logWithUserName">
+        select l.log_id log_id,l.operation_type operation_type,l.cost_time cost_time,l.is_success is_success,
+        l.operate_time operate_time,l.user_id user_id,u.user_name user_name
+        from tb_log l join tb_user u on l.user_id=u.uid order by operate_time desc
+    </select>
+    <insert id="insertLog">
+        insert into tb_log(operation_type,cost_time,is_success,operate_time,user_id)
+        values (#{operationType},#{costTime},#{isSuccess},#{operateTime},#{userId})
+    </insert>
+    <select id="selectLogByUserName" resultMap="logWithUserName">
+        select l.log_id log_id,l.operation_type operation_type,l.cost_time cost_time,l.is_success is_success,
+        l.operate_time operate_time,l.user_id user_id,u.user_name user_name
+        from tb_log l join tb_user u on l.user_id=u.uid where operation_type
+        like #{type} order by operate_time desc
+    </select>
+</mapper>

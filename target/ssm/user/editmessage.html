@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.siderpage{
+				position: fixed;
+				height: 100%;
+				width: 200px;
+			}
+			.userinfo{
+				padding: 5px;
+				width: 100%;
+				min-height: 75px;
+				margin-bottom: 10px;
+				text-align: center;
+			}
+			.siderpage{
+				background-color: #a0a0a0;
+				border: azure solid 1px;
+			}
+			.menu{
+				font-size: 1.5em;
+				text-align: center;
+				margin: 5px;
+				cursor: pointer;
+			}
+			.menu:hover{
+				background-color: cornflowerblue;
+			}
+			.menuselected{
+				background-color: #909090;
+			}
+			.menutitle{
+				font-size: 2em;
+				text-align: center;
+				margin-bottom: 10px;
+				background-color: #808080;
+				cursor: pointer;
+			}
+			.submenu{
+				
+			}
+			.mainpage{
+				margin-left: 200px;
+				width: 1000px;
+				height: 100%;
+				padding: 20px;
+			}
+			body{
+				background-color: darkgray;
+			}
+			.container{
+				margin-left: 120px;
+				margin-right: 160px;
+			}
+			td{
+				width: 20%;
+				text-align: center;
+				height: 50px;
+			}
+			table{
+				font-size: 1.5em;
+			}
+			table,th,tr,td{
+				border: black solid 1px;
+			}
+			.maininfo{
+				margin-top: 35px;
+			}
+			.userinfolist{
+				text-align: center;
+			}
+			input{
+				margin: 5px auto 5px;
+			}
+			.updatingmessage{
+				text-align: center;
+			}
+		</style>
+		<script>
+			function getmodifymessage(url){
+			    if (url.indexOf("?") == -1) {
+			        return;
+				}
+				url = url.split("cid=")[1];
+			    $.getJSON("/getmodifymessageinfo",{"cid":url},function (result) {
+                    var message = result.message;
+                    $("#cid").val(message.cid);
+                    $("#title").val(message.title);
+                    $("#content").html(message.content);
+                    $("#createmessage").remove();
+                    $("#modifymessage").show();
+                });
+			}
+			$(function(){
+                getmodifymessage(window.location.search);
+                $("body").on("click","#logout",function () {
+                    $.ajax({
+                        url:"/logout",
+                        success:function () {
+                            alert("下线成功");
+                            window.location.href = "/login.html";
+                        }
+                    });
+                });
+                $("#createmessage").click(function () {
+                    var title = $("#title").val();
+                    var content = $("#content").val();
+                    var data = {"title":title,"content":content};
+                    $.getJSON("/createmessage",data,function (result) {
+                        if (result.status == 200) {
+                            alert(result.message);
+                            window.location.href = "/user/messageboard.html";
+                        } else if (result.status == 400) {
+                            alert(result.message);
+                        }
+                    });
+                });
+                $("#modifymessage").click(function () {
+                    var title = $("#title").val();
+                    var cid = $("#cid").val();
+                    var content = $("#content").val();
+                    var data = {"cid":cid,"content":content,"title":title};
+                    $.getJSON("/modifymessage",data,function (result) {
+                        if (result.status == 200) {
+                            alert(result.message);
+                            window.location.href = "/user/messageboard.html";
+                        } else if (result.status == 400) {
+                            alert(result.message);
+                        }
+                    });
+                });
+                $("body").on("click","#logout",function () {
+                    $.ajax({
+                        url:"/logout",
+                        success:function () {
+                            alert("下线成功");
+                            window.location.href = "/login.html";
+                        }
+                    });
+                });
+                $.getJSON("/getuserinfo",function (result) {
+                    var user = result.user;
+                    var html = "<div style=\"font-size: 2em;text-align: center;\"><b>" + user.userName + "</b></div>" +
+                        "<div style=\"text-align: center;\"><span>" + user.email + "</span></div>" +
+                        "<div style=\"text-align: center;\"><button id=\"logout\">登出</button></div>";
+                    if (user.admin) {
+                        html +="<a href=\"/admin/userinfo.html\">管理员模式</a>";
+                    }
+                    $(".userinfo").append(html);
+                });
+                $.getJSON("/getuserinfowithrole",function (result) {
+                    var user = result.user;
+                    $("#uid").val(user.uid);
+                    $("#userName").val(user.userName);
+                    $("#email").val(user.email);
+                    $("#password").val(user.password);
+                    $("#number").val(user.number);
+                    $("#role").val(user.roleName);
+                });
+                $("#usercenter").click(function () {
+                    window.location.href = "/user/userinfo.html";
+                });
+                $("#messageboard").click(function () {
+                    window.location.href = "/user/messageboard.html";
+                });
+                $("#group").click(function () {
+                    window.location.href = "/user/usergroup.html";
+                });
+			});
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="siderpage">
+				<div class="userinfo">
+				</div>
+				<div class="menulist">
+					<div id="usercenter" class="menutitle">用户中心▽</div>
+					<div id="messageboard" class="menu">留言板</div>
+					<div id="group" class="menu">用户组</div>
+				</div>
+			</div>
+			<div class="mainpage">
+				<div class="headinfo">
+					<h1>个人信息</h1><a href="/admin/grouplist.html">管理员模式</a>
+				</div>
+				<hr/>
+				<div class="maininfo">
+					<div class="updatingmessage">
+						<input id="cid" type="hidden" />
+						标 题：<input id="title" name="groupName" style="width: 400px;"/><br/>
+						内 容：<textarea id="content" style="width: 400px;height: 150px;"></textarea><br/>
+						<button id="createmessage">确定创建</button>
+						<button id="modifymessage" style="display: none;">确认修改</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltc.rbacsys.mapper.UserRoleMapper">
+    <!--
+    boolean insertUserRole(UserRole userRole);
+    boolean updateUserRole(UserRole userRole);
+    UserRole selectUserRole(UserRole userRole);-->
+    <insert id="insertUserRole">
+        insert into tb_user_role(user_id,role_id) values(#{userId},#{roleId})
+    </insert>
+    <update id="updateUserRole">
+        update tb_user_role set role_id=#{roleId} where user_id=#{userId}
+    </update>
+    <select id="selectUserRole" resultType="ltc.rbacsys.bean.UserRole">
+        select * from tb_user_role where user_id=#{userId}
+    </select>
+</mapper>

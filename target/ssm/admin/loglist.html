@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">  
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.siderpage{
+				position: fixed;
+				height: 100%;
+				width: 200px;
+			}
+			.userinfo{
+				padding: 5px;
+				width: 100%;
+				min-height: 75px;
+				margin-bottom: 10px;
+				text-align: center;
+			}
+			.siderpage{
+				background-color: #a0a0a0;
+				border: azure solid 1px;
+			}
+			.menu{
+				font-size: 1.5em;
+				text-align: center;
+				margin: 5px;
+			}
+			.menu:hover{
+				background-color: cornflowerblue;
+			}
+			.menuselected{
+				background-color: #909090;
+			}
+			.menutitle{
+				font-size: 2em;
+				text-align: center;
+				margin-bottom: 10px;
+				/* border: black solid 0.1875rem; */
+				background-color: #808080;
+			}
+			.submenu{
+				
+			}
+			.mainpage{
+				margin-left: 200px;
+				/* background-color: aquamarine; */
+				width: 1000px;
+				height: 100%;
+				padding: 20px;
+			}
+			body{
+				margin: 0 auto 0;
+				background-color: darkgray;
+			}
+			.container{
+				margin-left: 120px;
+				margin-right: 160px;
+			}
+			td{
+				/* width: 20%; */
+				text-align: center;
+				height: 50px;
+			}
+			table{
+				font-size: 1.5em;
+			}
+			table,th,tr,td{
+				border: black solid 1px;
+			}
+			.maininfo{
+				margin-top: 35px;
+			}
+			.message{
+				margin: 5px auto 5px;
+			}
+			.messagetab{
+				width: 33%;
+				font-size: 2em;
+				border-left: #ddd solid 1px;
+				border-top: #ddd solid 1px;
+				border-right: #000 solid 1px;
+				border-bottom: #000 solid 1px;
+				color: blue;
+				padding: 5px;
+			}
+			
+			.active{
+				border-left: #000 solid 1px;
+				border-top: #000 solid 1px;
+				border-right: #ddd solid 1px;
+				border-bottom: #ddd solid 1px;
+			}
+			.usergrouplist{
+				margin: 10px;
+			}
+			.col_5_1{
+				width: 20%;
+			}
+			.col_5_2{
+				width: 40%;
+			}
+			.col_5_3{
+				width: 60%;
+			}
+			.col_2_1{
+				width: 50%;
+			}
+			.col_3_1{
+				width: 33%;
+			}
+			.col_10_1{
+				width: 10%;
+			}
+		</style>
+		<script>
+			function timeFormat(timestamp) {
+			    var time = new Date(timestamp);
+			    var year = time.getFullYear();
+			    var month = time.getMonth() + 1;
+			    var date = time.getDate();
+			    var hour = time.getHours();
+			    var minute = time.getMinutes();
+			    var second = time.getSeconds();
+			    return year + "-" + fillZero(month) + "-" + fillZero(date) + " "
+					+ fillZero(hour) + ":" + fillZero(minute) + ":" +fillZero(second);
+			}
+			function fillZero(time) {
+			    if (parseInt(time) < 10) {
+			        time = "0" + time;
+				}
+				return time;
+			}
+			function loadLog(url) {
+			    if (url.indexOf("type") == -1) {
+                    $.getJSON("/getalllog",function (result) {
+                        var logs = result.logs;
+                        $.each(logs, function (i, log) {
+                            var success = log.isSuccess?"成功":"失败";
+                            var html = "<tr><td class=\"col_10_1\">" + log.userId + "</td>" +
+                                "<td class=\"col_5_1\">" + log.userName + "</td>" +
+                                "<td class=\"col_5_1\">" + log.operationType + "</td>" +
+                                "<td class=\"col_5_1\">" + timeFormat(log.operateTime) + "</td>" +
+                                "<td class=\"col_10_1\">" + log.costTime + "s" + "</td>" +
+                                "<td class=\"col_5_1\">" + success + "</td></tr>";
+                            $(".logs").append(html);
+                        });
+                    });
+				} else {
+			        var type = url.split("type=")[1];
+			        $.getJSON("/searchlog",{"type":type},function (result) {
+                        var logs = result.logs;
+                        $.each(logs, function (i, log) {
+                            var success = log.isSuccess?"成功":"失败";
+                            var html = "<tr><td class=\"col_10_1\">" + log.userId + "</td>" +
+                                "<td class=\"col_5_1\">" + log.userName + "</td>" +
+                                "<td class=\"col_5_1\">" + log.operationType + "</td>" +
+                                "<td class=\"col_5_1\">" + timeFormat(log.operateTime) + "</td>" +
+                                "<td class=\"col_10_1\">" + log.costTime + "s" + "</td>" +
+                                "<td class=\"col_5_1\">" + success + "</td></tr>";
+                            $(".logs").append(html);
+                        });
+                    });
+				}
+			}
+			$(function(){
+			    loadLog(window.location.search);
+                $("body").on("click","#logout",function () {
+                    $.ajax({
+                        url:"/logout",
+                        success:function () {
+                            alert("下线成功");
+                            window.location.href = "/login.html";
+                        }
+                    });
+                });
+                $.getJSON("/getuserinfo",function (result) {
+                    var user = result.user;
+                    var html = "<div style=\"font-size: 2em;text-align: center;\"><b>" + user.userName + "</b></div>" +
+                        "<div style=\"text-align: center;\"><span>" + user.email + "</span></div>" +
+                        "<div style=\"text-align: center;\"><button id=\"logout\">登出</button></div>";
+                    html += "<a href='/user/userinfo.html'>返回普通模式</a>";
+                    $(".userinfo").append(html);
+                });
+
+                $("#searchlog").click(function () {
+					var url = window.location.search;
+                    if (url.indexOf("?") != -1) {
+                        url = window.location.search.split("?")[0];
+                    }
+                    window.location.href = encodeURI(url + "?type=" + $("#search").val());
+
+                });
+                $("#usercenter").click(function () {
+                    window.location.href = "/admin/userinfo.html";
+                });
+                $("#messagemanage").click(function () {
+                    window.location.href = "/admin/messagelist.html";
+                });
+                $("#groupmanage").click(function () {
+                    window.location.href = "/admin/grouplist.html";
+                });
+                $("#rolemanage").click(function () {
+                    window.location.href = "/admin/rolelist.html";
+                });
+                $("#usermanage").click(function () {
+                    window.location.href = "/admin/userlist.html";
+                });
+                $("#logdisplay").click(function () {
+                    window.location.href = "/admin/loglist.html";
+                });
+			});
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="siderpage">
+				<div class="userinfo">
+					
+				</div>
+				<div class="menulist">
+					<div id="usercenter" class="menutitle">管理菜单</div>
+					<div id="messagemanage" class="menu">留言管理</div>
+					<div id="groupmanage" class="menu">用户组管理</div>
+					<div id="rolemanage" class="menu">角色管理</div>
+					<div id="usermanage" class="menu">用户管理</div>
+					<div id="logdisplay" class="menu menuselected">日志查看</div>
+				</div>
+			</div>
+			<div class="mainpage">
+				<div class="headinfo">
+					<h1>日志记录</h1>
+				</div>
+				<hr/>
+				<input type="text" id="search" />
+				<button id="searchlog"><a href="#">查询</a></button>
+				<div class="maininfo">
+					<div id="mygroupinfo">
+					</div>
+					<div class="loglist">
+						<table class="logs" style="width: 100%">
+							<tr>
+								<td class="col_10_1">角色ID</td>
+								<td class="col_5_1">角色名</td>
+								<td class="col_5_1">操作</td>
+								<td class="col_5_1">操作时间</td>
+								<td class="col_10_1">操作时长</td>
+								<td class="col_5_1">操作结果</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

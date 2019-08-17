@@ -1,6 +1,7 @@
 package ltc.rbacsys.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import ltc.rbacsys.annotation.Log;
 import ltc.rbacsys.bean.Group;
 import ltc.rbacsys.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ public class GroupController {
     @Autowired
     GroupService groupService;
 
+    @Log("删除用户组")
     @ResponseBody
     @RequestMapping("/deletegroup")
     public String deleteGroup(Integer gid) {
@@ -26,6 +28,7 @@ public class GroupController {
         }
         return json.toJSONString();
     }
+    @Log("修改用户组")
     @ResponseBody
     @RequestMapping("/modifygroupinfo")
     public String modifyGroupInfo(Group group) {
@@ -40,6 +43,7 @@ public class GroupController {
         return json.toJSONString();
     }
 
+    @Log("新建用户组")
     @ResponseBody
     @RequestMapping("/creategroup")
     public String createGroup(Group group) {
